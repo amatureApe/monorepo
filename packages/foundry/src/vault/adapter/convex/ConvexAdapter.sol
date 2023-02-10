@@ -36,6 +36,8 @@ contract ConvexAdapter is AdapterBase, WithRewards {
                             INITIALIZATION
     //////////////////////////////////////////////////////////////*/
 
+  error InvalidPoolId(address booster, uint256 pid);
+
   /**
    * @notice Initialize a new Convex Adapter.
    * @param adapterInitData Encoded data for the base adapter initialization.
@@ -55,6 +57,10 @@ contract ConvexAdapter is AdapterBase, WithRewards {
 
     booster = IConvexBooster(_booster);
     pid = _pid;
+
+    if (_pid > booster.poolLength()) {
+      revert InvalidPoolId(_booster, _pid);
+    }
 
     (address _asset, , , address _baseRewarder, , ) = booster.poolInfo(pid);
     baseRewarder = IBaseRewarder(_baseRewarder);

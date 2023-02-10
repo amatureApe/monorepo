@@ -21,6 +21,8 @@ interface IConvexBooster {
       address stash,
       bool shutdown
     );
+
+  function poolLength() external view returns (uint256 length);
 }
 
 interface IBaseRewarder {
