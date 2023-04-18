@@ -5,10 +5,10 @@ pragma solidity ^0.8.15;
 
 import { Test } from "forge-std/Test.sol";
 
-import { AaveV2Adapter, SafeERC20, IERC20, IERC20Metadata, Math, ILendingPool, IAaveMining, IAToken, IProtocolDataProvider, DataTypes, IStrategy, IWithRewards } from "../../../../src/vault/adapter/aave/aaveV2/AaveV2Adapter.sol";
+import { AaveV2Adapter, SafeERC20, IERC20, IERC20Metadata, Math, ILendingPool, IAaveMining, IAToken, IProtocolDataProvider, DataTypes, IStrategy, IWithRewards } from "../../../../../src/vault/adapter/aave/aaveV2/AaveV2Adapter.sol";
 import { AaveV2TestConfigStorage, AaveV2TestConfig } from "./AaveV2TestConfigStorage.sol";
-import { AbstractAdapterTest, ITestConfigStorage, IAdapter } from "../abstract/AbstractAdapterTest.sol";
-import { MockStrategyClaimer } from "../../../utils/mocks/MockStrategyClaimer.sol";
+import { AbstractAdapterTest, ITestConfigStorage, IAdapter } from "../../abstract/AbstractAdapterTest.sol";
+import { MockStrategyClaimer } from "../../../../utils/mocks/MockStrategyClaimer.sol";
 
 contract AaveV2AdapterTest is AbstractAdapterTest {
   using Math for uint256;
@@ -84,13 +84,13 @@ contract AaveV2AdapterTest is AbstractAdapterTest {
   function verify_adapterInit() public override {
     assertEq(adapter.asset(), aToken.UNDERLYING_ASSET_ADDRESS(), "asset");
     assertEq(
-      IERC20Metadata(address(adapter)).symbol(),
-      string.concat("popB-", IERC20Metadata(address(asset)).symbol()),
-      "symbol"
+      IERC20Metadata(address(adapter)).name(),
+      string.concat("VaultCraft AaveV2 ", IERC20Metadata(address(asset)).name(), " Adapter"),
+      "name"
     );
     assertEq(
       IERC20Metadata(address(adapter)).symbol(),
-      string.concat("popB-", IERC20Metadata(address(asset)).symbol()),
+      string.concat("vcAv2-", IERC20Metadata(address(asset)).symbol()),
       "symbol"
     );
 

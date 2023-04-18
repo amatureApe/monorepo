@@ -70,36 +70,38 @@ function SweetVault({ vaultAddress, chainId, searchString, addToTVL, addToDeposi
 
 
   useEffect(() => {
-    if (totalAssets && totalSupply && balance && price
+    if (totalAssets && totalSupply && price
       && Number(totalAssets?.value?.toString()) > 0 && Number(totalSupply?.value?.toString()) > 0) {
-      const _pps = Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString());
-      const assetBal = _pps * Number(balance?.value?.toString());
-
-      setPps(_pps);
-
-      addToDeposit(
-        vaultAddress,
-        parseUnits(String((
-          (Number(price?.value?.toString()) * assetBal) /
-          (10 ** (token?.decimals * 2))))
-        )
-      );
+      setPps(Number(totalAssets?.value?.toString()) / Number(totalSupply?.value?.toString()));
     }
   }, [balance, totalAssets, totalSupply, price])
 
   useEffect(() => {
+    if (price && balance && pps > 0) {
+      const assetBal = pps * Number(balance?.value?.toString());
+      const depositValue = (Number(price?.value?.toString()) * assetBal) /
+        (10 ** (token?.decimals * 2))
+
+      addToDeposit(
+        vaultAddress,
+        parseUnits(depositValue < 0.01 ? "0" : String(depositValue))
+      );
+    }
+  }, [balance, price, pps])
+
+  useEffect(() => {
     if (totalAssets && price) {
+      const tvlValue = (Number(price?.value?.toString()) * Number(totalAssets?.value?.toString())) /
+        (10 ** (token?.decimals * 2))
+
       addToTVL(
         vaultAddress,
-        parseUnits(String(
-          ((Number(price?.value?.toString()) * Number(totalAssets?.value?.toString())) /
-            (10 ** (token?.decimals * 2))))
-        )
-      );
+        parseUnits(tvlValue < 0.01 ? "0" : String(tvlValue)));
     }
   }, [totalAssets, price])
 
-  if (!vaultMetadata) return <></>
+  // TEMP - filter duplicate vault
+  if (!vaultMetadata || vault?.address === "0xcf0D91fB9Bc81ac605D2F1962a72Fac8901F57bE") return <></>
   if (searchString === "" ||
     vault?.name.toLowerCase().includes(searchString) ||
     vault?.symbol.toLowerCase().includes(searchString))
@@ -202,7 +204,14 @@ function SweetVault({ vaultAddress, chainId, searchString, addToTVL, addToDeposi
         <div className="flex flex-col md:flex-row mt-8 gap-8">
           <div className="flex flex-col w-full md:w-4/12 gap-8">
             <section className="bg-white flex-grow rounded-lg border border-customLightGray w-full p-6">
-              <DepositWithdraw chainId={chainId} vault={vaultAddress} asset={token?.address} staking={vaultMetadata?.staking} getTokenUrl={vaultMetadata?.metadata?.getTokenUrl} />
+              <DepositWithdraw
+                chainId={chainId}
+                vault={vaultAddress}
+                asset={token?.address}
+                staking={vaultMetadata?.staking}
+                getTokenUrl={vaultMetadata?.metadata?.getTokenUrl}
+                pps={pps}
+              />
             </section>
           </div>
           <div className="md:hidden flex w-full">

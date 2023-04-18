@@ -77,13 +77,13 @@ contract ConvexAdapterTest is AbstractAdapterTest {
   function verify_adapterInit() public override {
     assertEq(adapter.asset(), address(asset), "asset");
     assertEq(
-      IERC20Metadata(address(adapter)).symbol(),
-      string.concat("popB-", IERC20Metadata(address(asset)).symbol()),
-      "symbol"
+      IERC20Metadata(address(adapter)).name(),
+      string.concat("VaultCraft Convex ", IERC20Metadata(address(asset)).name(), " Adapter"),
+      "name"
     );
     assertEq(
       IERC20Metadata(address(adapter)).symbol(),
-      string.concat("popB-", IERC20Metadata(address(asset)).symbol()),
+      string.concat("vcCvx-", IERC20Metadata(address(asset)).symbol()),
       "symbol"
     );
 
@@ -103,7 +103,7 @@ contract ConvexAdapterTest is AbstractAdapterTest {
       testConfigStorage.getTestConfig(0)
     );
 
-    _mintFor(1000e18, bob);
+    _mintAssetAndApproveForAdapter(1000e18, bob);
 
     vm.prank(bob);
     adapter.deposit(1000e18, bob);
