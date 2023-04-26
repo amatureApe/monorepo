@@ -1,10 +1,7 @@
 import type { NextPage } from "next";
 
-import Image from "next/image";
-
 import { useAllVaults } from "@popcorn/components/hooks/vaults";
 import SweetVault from "../components/SweetVault";
-import asset_bg from "../assets/sv-bg.png";
 import { ChainId, formatAndRoundBigNumber } from "@popcorn/utils";
 import NoSSR from "react-no-ssr";
 import HeroSection from "@popcorn/components/components/HeroSection";
@@ -16,6 +13,8 @@ import { useAccount } from "wagmi";
 
 const SUPPORTED_NETWORKS = [
   ChainId.ALL,
+  ChainId.Ethereum,
+  ChainId.Polygon,
   ChainId.Optimism,
   // ChainId.Fantom,
   ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [ChainId.Hardhat] : [])
@@ -32,11 +31,13 @@ const SweetVaults: NextPage = () => {
   const [tvl, setTvl] = useState<Bal>({});
   const [deposit, setDeposit] = useState<Bal>({});
 
-  const { data: hhVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Hardhat) ? ChainId.Hardhat : undefined);
+  const { data: ethVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Ethereum) ? ChainId.Ethereum : undefined);
+  const { data: polyVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Polygon) ? ChainId.Polygon : undefined);
   const { data: ftmVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Fantom) ? ChainId.Fantom : undefined);
   const { data: opVaults = [] } = useAllVaults(selectedNetworks.includes(ChainId.Optimism) ? ChainId.Optimism : undefined);
   const allVaults = [
-    ...hhVaults.map(vault => { return { address: vault, chainId: ChainId.Hardhat } }),
+    ...ethVaults.map(vault => { return { address: vault, chainId: ChainId.Ethereum } }),
+    ...polyVaults.map(vault => { return { address: vault, chainId: ChainId.Polygon } }),
     ...ftmVaults.map(vault => { return { address: vault, chainId: ChainId.Fantom } }),
     ...opVaults.map(vault => { return { address: vault, chainId: ChainId.Optimism } })
   ]
@@ -64,7 +65,7 @@ const SweetVaults: NextPage = () => {
     <NoSSR>
       <HeroSection
         title="Sweet Vaults"
-        description="Add liquidity to earn stablecoin rewards and be part at creating social impact."
+        description="Deposit your crypto to optimize your yield while funding public goods."
         info1={{ title: 'TVL', value: `$${formatAndRoundBigNumber(Object.keys(tvl).reduce((total, key) => total.add(tvl[key]), constants.Zero), 18)}` }}
         info2={{ title: 'Deposits', value: `$${account ? formatAndRoundBigNumber(Object.keys(deposit).reduce((total, key) => total.add(deposit[key]), constants.Zero), 18) : "-"}` }}
         backgroundColorTailwind="bg-red-400"
